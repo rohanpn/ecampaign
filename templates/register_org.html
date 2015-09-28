@@ -2,9 +2,11 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <title>Register</title>
+    <title>Organization Registration Form</title>
 </head>
 <body>
+
+<div>
     <form action="{% url 'register' %}" method="post">
         {% csrf_token %}
 
@@ -31,6 +33,11 @@
         </tr><br><br>
 
         <tr>
+            <td><label>Phone Number</label>
+            <input type="text"  name="phone" required="phone"></td>
+        </tr><br><br>
+
+        <tr>
             <td><label>Pincode</label>
             <input type="text"  name="pin_code" required="pin_code" ></td>
         </tr><br><br>
@@ -52,7 +59,10 @@
 
         <input type="submit" value="submit"><br><br>
 
+        {%if error %}
+            {{ error }}
+        {% endif %}
     </form>
-
+</div>
 </body>
 </html>
