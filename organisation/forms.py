@@ -1,9 +1,18 @@
+
+
+
+
 __author__ = 'rohan'
 
-import forms
-from . import models
+from django  import forms
+from django.db import IntegrityError
+from organisation.models import Organisation
 
-class organisationForm(forms.Form):
+class OrganisationRegistrationForm(forms.Form):
+    """
+        To Register the Organisation
+    """
+    model = Organisation
     org_name = forms.CharField(max_length=50)
     address = forms.CharField(max_length=100)
     pin_code = forms.CharField()
@@ -13,21 +22,8 @@ class organisationForm(forms.Form):
     phone = forms.CharField()
     password = forms.CharField()
 
-
     def clean_org_name(self):
-        pass
-
-    def clean_address(self):
-        pass
-
-    def clean_pin_code(self):
-        pass
-
-    def clean_first_name(self):
-        pass
-
-    def clean_last_name(self):
-        pass
-
-    def clean_email(self):
-        pass
+        data = self.cleaned_data['org_name']
+        if Organisation.objects.filter(org_name=data).exists():
+            return None
+        return data
