@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Organisation</title>
+</head>
+<body>
+    <form action="{% url 'org_login' %}" method="post">
+        {% csrf_token %}
+        <tr>
+            <td><label>Email ID</label>
+            <input type="text"  name="email" required="email" ></td>
+        </tr>
+        <br><br>
+
+        <tr>
+            <td><label>Password</label>
+            <input type="password"  name="password" required="password" ></td>
+        </tr><br><br>
+        <input type="submit" value="submit"><br><br>
+    </form>
+</body>
+</html>
