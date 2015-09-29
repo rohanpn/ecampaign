@@ -32,8 +32,8 @@ class OrganisationRegistrationForm(forms.ModelForm):
             raise ValidationError("Organisation name already exists.")
         return data
 
-    def clean_first_name(self):
-        data = self.cleaned_data['first_name']
+    # def clean_first_name(self):
+    #     data = self.cleaned_data['first_name']
 
 
 
