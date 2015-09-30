@@ -1,17 +1,17 @@
+import re
 from django.core.exceptions import ValidationError
-
-
-__author__ = 'rohan'
-
 from django  import forms
-from django.db import IntegrityError
 from organisation.models import Organisation
+from django.core.validators import RegexValidator
+
+
 
 class OrganisationRegistrationForm(forms.ModelForm):
     """
         To Register the Organisation
     """
     confirm_password = forms.CharField(max_length=30, widget=forms.PasswordInput)
+
     class Meta:
         model = Organisation
         exclude=['sub_domain']
@@ -32,9 +32,33 @@ class OrganisationRegistrationForm(forms.ModelForm):
             raise ValidationError("Organisation name already exists.")
         return data
 
-    # def clean_first_name(self):
-    #     data = self.cleaned_data['first_name']
+    def clean_first_name(self):
+        data = self.cleaned_data['first_name']
+        check = re.compile(r'^[a-zA-Z]*$')
+        if check.match(data) == None:
+            raise ValidationError("First Name should contain only alphabets.")
+        return data
 
+    def clean_last_name(self):
+        data=self.cleaned_data['last_name']
+        check = re.compile(r'^[a-zA-Z]*$')
+        if check.match(data) == None:
+            raise ValidationError("Last Name should contain only alphabets.")
+        return data
+
+    def clean_phone(self):
+        data =self.cleaned_data['phone']
+        check = re.compile(r'^\+?1?\d{9,15}$')
+        if check.match(data) == None:
+            raise ValidationError("Phone number format should be +99999999999 and can contain upto 15 digits.")
+        return data
+
+    def clean_pin_code(self):
+        data=self.cleaned_data['pin_code']
+        check = re.compile(r'[0-9]+$')
+        if check.match(data) == None:
+            raise ValidationError("Postal Code should not contain alphabets.")
+        return data
 
 
 class OrganisationDomainForm(forms.ModelForm):
@@ -45,5 +69,8 @@ class OrganisationDomainForm(forms.ModelForm):
     def clean_sub_domain(self):
         data =self.cleaned_data['sub_domain']
         if Organisation.objects.filter(sub_domain=data).exists():
-            raise ValidationError("This Sub-domain is not available. Please enter different name.")
+            raise ValidationError("This sub-domain is not available. Please enter different name.")
+        check = re.compile(r'^[a-zA-Z0-9-]*$')
+        if check.match(data) == None:
+            raise ValidationError("The Domain name should contain only numbers and characters")
         return data
