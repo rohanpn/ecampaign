@@ -16,7 +16,8 @@ class OrganisationRegistrationForm(forms.ModelForm):
         model = Organisation
         exclude=['sub_domain']
         widgets={
-            'password' : forms.PasswordInput
+            'password' : forms.PasswordInput,
+            'pin_code' : forms.NumberInput
         }
 
     def clean(self):
@@ -74,3 +75,4 @@ class OrganisationDomainForm(forms.ModelForm):
         if check.match(data) == None:
             raise ValidationError("The Domain name should contain only numbers and characters")
         return data
+
