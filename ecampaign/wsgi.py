@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/1.8/howto/deployment/wsgi/
 
 import os, sys, site, socket
 
-VIRTUAL_ENV_PATH = '/home/rohan/pyenvs/ecampaign'
+VIRTUAL_ENV_PATH = '/home/rohan/pyenvs/Ecampaign'
 SITE_PACKAGES_DIR = os.path.join(VIRTUAL_ENV_PATH, 'lib/python2.7/site-packages')
 
 site.addsitedir(SITE_PACKAGES_DIR)
