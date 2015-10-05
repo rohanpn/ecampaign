@@ -1,5 +1,5 @@
 import re
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django  import forms
 from organisation.models import Organisation
 from django.core.validators import RegexValidator
@@ -73,6 +73,31 @@ class OrganisationDomainForm(forms.ModelForm):
             raise ValidationError("This sub-domain is not available. Please enter different name.")
         check = re.compile(r'^[a-zA-Z0-9-]*$')
         if check.match(data) == None:
-            raise ValidationError("The Domain name should contain only numbers and characters")
+            raise ValidationError("The sub-domain should contain only numbers and characters")
         return data
+
+
+
+class OrganisationLoginForm(forms.Form):
+    email_id = forms.EmailField()
+    password= forms.CharField(widget=forms.PasswordInput)
+    domain = forms.CharField(widget=forms.HiddenInput)
+
+    def clean(self):
+        cleaned_data = super(OrganisationLoginForm, self).clean()
+        domain = cleaned_data['domain']
+        domain = domain.split(":")
+        domain = domain[0].split(".")
+        sub_domain = domain[0]
+        cleaned_data['sub_domain'] = sub_domain
+
+        if Organisation.objects.filter(sub_domain=sub_domain).exists():
+            org = Organisation.objects.get(sub_domain=sub_domain)
+            if org.email != cleaned_data['email_id'] or org.password != cleaned_data['password']:
+                raise ValidationError("Email Id or password did not match.")
+            return cleaned_data
+
+        else:
+            raise ValidationError("No such domain exist.")
+
 
