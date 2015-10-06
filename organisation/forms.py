@@ -58,11 +58,12 @@ class OrganisationRegistrationForm(forms.ModelForm):
         data=self.cleaned_data['pin_code']
         check = re.compile(r'[0-9]+$')
         if check.match(data) == None:
-            raise ValidationError("Postal Code should not contain alphabets.")
+            raise ValidationError("Pin Code should not contain alphabets.")
         return data
 
 
 class OrganisationDomainForm(forms.ModelForm):
+
     class Meta:
         model = Organisation
         fields= ('sub_domain',)
@@ -82,21 +83,22 @@ class OrganisationLoginForm(forms.Form):
     email_id = forms.EmailField()
     password= forms.CharField(widget=forms.PasswordInput)
     domain = forms.CharField(widget=forms.HiddenInput)
+    remember_me = forms.BooleanField(required=False, widget=forms.CheckboxInput)
 
     def clean(self):
+
         cleaned_data = super(OrganisationLoginForm, self).clean()
         domain = cleaned_data['domain']
-        domain = domain.split(":")
-        domain = domain[0].split(".")
+        domain = domain.split(".")
         sub_domain = domain[0]
         cleaned_data['sub_domain'] = sub_domain
 
         if Organisation.objects.filter(sub_domain=sub_domain).exists():
-            org = Organisation.objects.get(sub_domain=sub_domain)
-            if org.email != cleaned_data['email_id'] or org.password != cleaned_data['password']:
+            object = Organisation.objects.get(sub_domain=sub_domain)
+            if object.email != cleaned_data['email_id'] or object.password != cleaned_data['password']:
                 raise ValidationError("Email Id or password did not match.")
-            return cleaned_data
-
+            else:
+                return cleaned_data
         else:
             raise ValidationError("No such domain exist.")
 

@@ -1,5 +1,6 @@
+from django.contrib.auth import authenticate
 from django.core.urlresolvers import reverse_lazy, reverse
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render_to_response, render, redirect
 from django.views.generic.base import View, TemplateView
 from django.views.generic.detail import DetailView
@@ -67,25 +68,31 @@ class CheckDomainView(TemplateView):
         if host[0] == server_name:
             return redirect(reverse('org_home'))
         else:
-            self.get_context_data(*args, **kwargs)
-            return super(CheckDomainView, self).get(request, *args, **kwargs)
+            context = self.get_context_data(*args, **kwargs)
+            if context == None:
+                return HttpResponseBadRequest("No such organisation registered.")
+            else:
+                return super(CheckDomainView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
+
         context = super(CheckDomainView, self).get_context_data(*args, **kwargs)
         host = self.request.META.get('HTTP_HOST')
         host_name = host.split(":")
         host = host_name[0].split(".")
         if Organisation.objects.filter(sub_domain=host[0]).exists():
             org=Organisation.objects.get(sub_domain=host[0])
-            context['domain']= org.org_name
+            context['organisation']= org.org_name
             return context
         else:
-            return HttpResponse("No such Organisation exists.")
-
+            return None
 
 
 class OrganisationLoginView(FormView):
+    """
+        Login to the organisation and if valid user redirect to the dashboard.
+    """
+
     template_name = "organisation/org_login.html"
     form_class=OrganisationLoginForm
     success_url=reverse_lazy('success_login')
-
